@@ -39,7 +39,7 @@ public class AccountingLedgerApp {
                 case "L":
                     ledger(); break;
                 case "X":
-                    System.out.println("Exiting Program"); return;
+                    System.out.println("Bye Bye"); return;
                 default: System.out.println("Try again.");
             }
         }
@@ -150,7 +150,8 @@ public class AccountingLedgerApp {
     public static List<Transactions> getDeposits() {
         List<Transactions> deposits = new ArrayList<>();
         for (Transactions t : getAllTransactions()) {
-            if (t.getAmount() >= 0) deposits.add(t);{
+            if (t.getAmount() >= 0){
+                deposits.add(t);
             }
         }
         return deposits;
@@ -159,7 +160,7 @@ public class AccountingLedgerApp {
     public static List<Transactions> getPayments() {
         List<Transactions> payments = new ArrayList<>();
         for (Transactions t : getAllTransactions()) {
-            if (t.getAmount() < 0) payments.add(t);{
+            if (t.getAmount() < 0){
                 payments.add(t);
             }
         }
@@ -204,7 +205,7 @@ public class AccountingLedgerApp {
                 case "5":
                     System.out.print("Enter vendor name: ");
                     String vendor = scanner.nextLine();
-                    displayTransactions(searchByVendor(vendor));
+                    displayTransactions(searchVendor(vendor));
                     break;
                 case "0": return;
                 default: System.out.println("Invalid option. Try again.");
@@ -257,7 +258,7 @@ public class AccountingLedgerApp {
         return result;
     }
 
-    public static List<Transactions> searchByVendor(String vendor) {
+    public static List<Transactions> searchVendor(String vendor) {
         List<Transactions> result = new ArrayList<>();
         for (Transactions t : getAllTransactions()) {
             if (t.getVendor().equalsIgnoreCase(vendor)) {
