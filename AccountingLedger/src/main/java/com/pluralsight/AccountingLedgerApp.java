@@ -106,12 +106,15 @@ public class AccountingLedgerApp {
 
             switch (option) {
                 case "A":
+                    System.out.println("\n----All Transactions----");
                     displayTransactions(getAllTransactions());
                     break;
                 case "D":
+                    System.out.println("\n----Only Deposits----");
                     displayTransactions(getDeposits());
                     break;
                 case "P":
+                    System.out.println("\n----Only Payments----");
                     displayTransactions(getPayments());
                     break;
                 case "R":
@@ -191,15 +194,19 @@ public class AccountingLedgerApp {
 
             switch (option) {
                 case "1":
+                    System.out.println("\n----Month To Date Report----");
                     displayTransactions(getMonthToDateTransactions());
                     break;
                 case "2":
+                    System.out.println("\n----Previous Month Report----");
                     displayTransactions(getPreviousMonthTransactions());
                     break;
                 case "3":
+                    System.out.println("\n----Year To Date Report----");
                     displayTransactions(getYearToDateTransactions());
                     break;
                 case "4":
+                    System.out.println("\n----Previous Year Report----");
                     displayTransactions(getPreviousYearTransactions());
                     break;
                 case "5":
