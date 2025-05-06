@@ -16,6 +16,7 @@ import java.util.Scanner;
 public class AccountingLedgerApp {
     private static final Scanner scanner = new Scanner(System.in);
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd|HH:mm:ss");
+
     public static void main(String[] args) {
         homeScreen();
         scanner.close();
@@ -33,14 +34,19 @@ public class AccountingLedgerApp {
 
             switch (option) {
                 case "D":
-                    addDeposit(); break;
+                    addDeposit();
+                    break;
                 case "P":
-                    makePayment(); break;
+                    makePayment();
+                    break;
                 case "L":
-                    ledger(); break;
+                    ledger();
+                    break;
                 case "X":
-                    System.out.println("Bye Bye"); return;
-                default: System.out.println("Try again.");
+                    System.out.println("Bye Bye");
+                    return;
+                default:
+                    System.out.println("Try again.");
             }
         }
     }
@@ -58,7 +64,7 @@ public class AccountingLedgerApp {
         LocalDateTime now = LocalDateTime.now();
         String depositRecord = String.format("%s|%s|%s|%.2f%n", now.format(DATE_TIME_FORMATTER), description, vendor, amount);
 
-        try  {
+        try {
             FileWriter fileWriter = new FileWriter("transactions.csv", true);
             BufferedWriter writer = new BufferedWriter(fileWriter);
             writer.write(depositRecord);
@@ -120,8 +126,10 @@ public class AccountingLedgerApp {
                 case "R":
                     reports();
                     break;
-                case "H": return;
-                default: System.out.println("Try again. :p");
+                case "H":
+                    return;
+                default:
+                    System.out.println("Try again. :p");
             }
         }
     }
@@ -153,7 +161,7 @@ public class AccountingLedgerApp {
     public static List<Transactions> getDeposits() {
         List<Transactions> deposits = new ArrayList<>();
         for (Transactions t : getAllTransactions()) {
-            if (t.getAmount() >= 0){
+            if (t.getAmount() >= 0) {
                 deposits.add(t);
             }
         }
@@ -163,7 +171,7 @@ public class AccountingLedgerApp {
     public static List<Transactions> getPayments() {
         List<Transactions> payments = new ArrayList<>();
         for (Transactions t : getAllTransactions()) {
-            if (t.getAmount() < 0){
+            if (t.getAmount() < 0) {
                 payments.add(t);
             }
         }
@@ -176,10 +184,11 @@ public class AccountingLedgerApp {
             return;
         }
         for (Transactions t : list) {
-            System.out.printf("%15s | %15s | %13s | %10.2f%n",
-                    t.getDateTime(), t.getDescription(), t.getVendor(), t.getAmount());
+            System.out.printf("%19s | %15s | %13s | %10.2f%n",
+                    t.getDateTime().format(DATE_TIME_FORMATTER), t.getDescription(), t.getVendor(), t.getAmount());
         }
     }
+
     public static void reports() {
         while (true) {
             System.out.println("\n--Reports--");
@@ -188,6 +197,7 @@ public class AccountingLedgerApp {
             System.out.println("3) Year To Date");
             System.out.println("4) Previous Year");
             System.out.println("5) Search by Vendor");
+            System.out.println("6)Customer Search");
             System.out.println("0) Back to Ledger");
             System.out.print("Enter command: ");
             String option = scanner.nextLine();
@@ -214,11 +224,17 @@ public class AccountingLedgerApp {
                     String vendor = scanner.nextLine();
                     displayTransactions(searchVendor(vendor));
                     break;
-                case "0": return;
-                default: System.out.println("Invalid option. Try again.");
+                case "6":
+                    displayTransactions(customerSearch());
+                    break;
+                case "0":
+                    return;
+                default:
+                    System.out.println("Invalid option. Try again.");
             }
         }
     }
+
     public static List<Transactions> getMonthToDateTransactions() {
         List<Transactions> result = new ArrayList<>();
         LocalDate today = LocalDate.now();
@@ -274,5 +290,75 @@ public class AccountingLedgerApp {
         }
         return result;
     }
+
+    public static List<Transactions> customerSearch() {
+
+        System.out.print("Start date (yyyy-MM-dd): ");
+        String startDate = scanner.nextLine();
+        System.out.print("End date (yyyy-MM-dd): ");
+        String endDate = scanner.nextLine();
+        System.out.print("Description: ");
+        String description = scanner.nextLine();
+        System.out.print("Vendor: ");
+        String vendor = scanner.nextLine();
+        System.out.print("Amount: ");
+        String amount = scanner.nextLine();
+
+        LocalDate start_Date = null;
+        LocalDate end_Date = null;
+        Double amounts = null;
+
+        try {
+            if (!startDate.isEmpty()) {
+                start_Date = LocalDate.parse(startDate);
+            }
+            if (!endDate.isEmpty()) {
+                end_Date = LocalDate.parse(endDate);
+            }
+            if (!amount.isEmpty()) {
+                amounts = Double.parseDouble(amount);
+            }
+        } catch (Exception e) {
+            System.out.println("Try again.Put in the right information. :p");
+            return new ArrayList<>();
+        }
+
+        List<Transactions> all = getAllTransactions();
+        List<Transactions> results = new ArrayList<>();
+
+        for (Transactions t : all) {
+            LocalDate date = t.getDateTime().toLocalDate();
+
+            if (start_Date != null) {
+                if (date.isBefore(start_Date)) {
+                    continue;
+                }
+            }
+            if (end_Date != null) {
+                if (date.isAfter(end_Date)) {
+                    continue;
+                }
+            }
+            if (!description.isEmpty()) {
+                if (!t.getDescription().toLowerCase().contains(description.toLowerCase())) {
+                    continue;
+                }
+            }
+            if (!vendor.isEmpty()) {
+                if (!t.getVendor().toLowerCase().contains(vendor.toLowerCase())) {
+                    continue;
+                }
+            }
+            if (amounts != null) {
+                if (t.getAmount() != amounts) {
+                    continue;
+                }
+            }
+            results.add(t);
+        }
+        System.out.println("\n----Customer Searched results ;p-----");
+        return results;
+    }
+
 }
 
